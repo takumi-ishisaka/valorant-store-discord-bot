@@ -1,1 +1,1 @@
-# valorant_store_disco_bot
+# valorant-store-discord-bot
