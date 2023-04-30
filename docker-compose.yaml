@@ -1,0 +1,8 @@
+version: '0.1'
+services:
+  server:
+    build:
+      context: .
+    tty: true
+    volumes:
+      - ./:/app:delegated

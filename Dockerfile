@@ -1,4 +1,4 @@
-FROM golang:1.20.3-slim
+FROM golang:1.20.3
 
 ENV APP_BASE_PATH = /APP_BASE_PATH
 RUN apt-get update \
