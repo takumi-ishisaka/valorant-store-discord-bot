@@ -4,52 +4,34 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"golang.org/x/exp/slog"
 	"syscall"
 	"github.com/takumi-ishisaka/valorant-store-discord-bot/handlers"
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
 )
 
+
 func main() {
-	// // Discord client new
-	// discord, err := discordgo.New("Bot " + os.Getenv("BOT_TOKEN"))
-	// if err != nil {
-	// 	fmt.Println("error creating Discord session,", err)
-	// 	return
-	// }
-
-	// dg.AddHandler(handlers.MessageCreate)
-
-	// err = dg.Open()
-	// if err != nil {
-	// 	fmt.Println("error opening connection,", err)
-	// 	return
-	// }
-
-	// fmt.Println("Bot is now running. Press CTRL-C to exit.")
-	// sc := make(chan os.Signal, 1)
-	// signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	// <-sc
-
-	// dg.Close()
-
 	godotenv.Load(".env")
+	logger := slog.New(slog.HandlerOptions{AddSource: true,}.NewJSONHandler(os.Stdout))
 
-	discord, err := discordgo.New("Bot " + os.Getenv("BOT_TOKEN"))
+	dg, err := discordgo.New("Bot " + os.Getenv("BOT_TOKEN"))
 	if err != nil {
 		fmt.Println("ログインに失敗しました")
-		fmt.Println(err)
+		logger.Error("", err)
 	}
 
-	discord.AddHandler(handlers.OnMessageCreate)
-	discord.Open()
+	dg.AddHandler(handlers.OnMessageCreate)
+
+	dg.Open()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Discordのオープンに失敗しました")
+		logger.Error("", err)
 	}
+	defer dg.Close()
 
-	defer discord.Close()
-
-	fmt.Println("bot is running")
+	fmt.Println("Bot is running. Press CTRL-C to exit.")
 
 	stopBot := make(chan os.Signal, 1)
 	signal.Notify(stopBot, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
